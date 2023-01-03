@@ -1,0 +1,4 @@
+编号	hp	speed	rotatespeed	weapon
+ID001	5	300	60	ID002/ID001/ID001/
+ID002	2	200	45	null/
+ID003	10	300	60	ID001/

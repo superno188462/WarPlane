@@ -25,7 +25,7 @@ public class EntitySystem : Singleton<EntitySystem>
     public static Dictionary<string, string> waveInfo;
 
     //数据文本下载路径
-    public const string EntityDataUrl = "/Config//EntityData.txt";
+    public const string EntityDataUrl = "/Config/EntityData.txt";
     public const string EntityWeaponDataUrl = "/Config//EntityWeaponData.txt";
     public const string EntityBulletDataUrl = "/Config//EntityBulletData.txt";
     public const string waveInfoUrl = "/Config/WaveData.txt";

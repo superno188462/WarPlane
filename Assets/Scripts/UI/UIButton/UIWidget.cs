@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        .cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       不使用
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;

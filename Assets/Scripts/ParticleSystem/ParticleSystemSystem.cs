@@ -1,8 +1,18 @@
-﻿using System.Collections.Generic;
+﻿/***********************************************
+ * \file        ParticleSystemSystem.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       特效系统
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ParticleSystemSystem : Singleton<ParticleSystemSystem>
 {
+    //绑定特效名称和特效路径，目前初始化但是没有用它
     private Dictionary<string, string> dict;
 
 
@@ -14,10 +24,12 @@ public class ParticleSystemSystem : Singleton<ParticleSystemSystem>
 
     }
 
+    //初始化特效字典
     private void Init()
     {
-        string content = WebLoad.Load("Assets/Resources/FX/ParticleSystem.txt");
-        //Debug.Log(content);
+        //string content = WebLoad.Load("Assets/Resources/FX/ParticleSystem.txt");
+        string content = WebLoad.Load(Application.streamingAssetsPath+"/Config/ParticleSystem.txt");
+       
         string[] lines = content.Split('\n');
         //Debug.Log(lines.Length);
         for (int i = 0; i < lines.Length ; i++)
@@ -32,6 +44,7 @@ public class ParticleSystemSystem : Singleton<ParticleSystemSystem>
         }
     }
 
+    //在指定位置展示特效
     public void PlayParticleSystem(string id,Vector3 point)
     {
         ParticleSystem ps = GetParticleSystem(id);
@@ -39,7 +52,7 @@ public class ParticleSystemSystem : Singleton<ParticleSystemSystem>
         //Instantiate(ps.transform,position,Quaternion.identity);
     }
 
-
+    //获取特效
     public ParticleSystem GetParticleSystem(string id)
     {
         Debug.Log(id);
@@ -51,6 +64,7 @@ public class ParticleSystemSystem : Singleton<ParticleSystemSystem>
         return null;
     }
 
+    //在指定位置展示特效
     public void TestPlayer(Vector3 position)
     {
         GameObject obj = PoolSystem.Instance.GetObj("FX/Weapon/ID003" );

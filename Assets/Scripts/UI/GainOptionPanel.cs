@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        GainOptionPanel.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       增益panel
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,8 +15,10 @@ using UnityEngine.Events;
 
 public class GainOptionPanel : UIPanel
 {
+    //记录了Panel下有的按钮
     public Dictionary<string, Button> btns;
 
+    //控制该组件的隐藏和显示
     public bool isUsed;
     public Transform key;
 
@@ -58,12 +69,9 @@ public class GainOptionPanel : UIPanel
         gainString.Add("攻击力+1");
         gainAction.Add(Gain0);
     }
-    public Button FindChildByName(string str)
-    {
-        return btns[str];
-    }
+    
 
-    //增益表显示
+    //增益表显示，并未按钮随机增加文本和事件
     public void ShowGainOption()
     {
         isUsed = true;

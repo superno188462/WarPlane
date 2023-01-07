@@ -1,4 +1,12 @@
-﻿
+﻿/***********************************************
+ * \file        UIButton.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       生成单位 按钮专用
+ * \note        在玩家附近生成一个ID001单位
+ * \remarks     
+ ***********************************************/
 using System.Collections;
 using System.Collections.Generic;
 using System;

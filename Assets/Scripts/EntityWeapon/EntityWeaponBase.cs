@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        EntityWeaponBase.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       武器类，没有子类
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,13 +22,16 @@ public enum AttackType
     scattering,
 }
 
+//武器属性
 public class EntityWeaponAttr
 {
     public UIWeaponTable table;
 
+    //子弹ID、攻击类型、子弹数量上限
     public string bullet;
     public AttackType attackType;
     public int cartridge;
+   //装弹时间、射击间隔
     public float reloadTime;
     public float shootTime;
     
@@ -41,24 +53,31 @@ public class EntityWeaponAttr
 
 public class EntityWeaponBase : MonoBehaviour
 {
+    
     //链接关系
+    //武器归属
     public EntityBase entity;
+    //对应ui武器表中的武器，只有玩家单位会有
     public UIWeaponTable table;
 
-    //属性
+    //基本属性，射击定时器，装弹定时器
     public EntityWeaponAttr attr;
     public float shootTimer;
     public float reloadTimer;
+    //子弹数量
     public int cartridgeCounter;
 
+    //攻击距离
     public float attackDistance;
 
+    //初始化武器归属、实例化属性类
     private void Awake()
     {
         entity = GetComponentInParent<EntityBase>();
         attr = new EntityWeaponAttr();
     }
 
+    //初始化属性，并重置定时器
     public void Init(string str)//ID001
     {
         //Debug.Log($"武器编号: {str} 字符长度 {str.Length}");
@@ -69,10 +88,12 @@ public class EntityWeaponBase : MonoBehaviour
         reloadTimer = attr.reloadTime;
         cartridgeCounter = attr.cartridge;
         //attr.Show();
+        //武器攻击距离等于子弹攻击距离
         attackDistance = float.Parse(EntitySystem.entityBullet[attr.bullet][2]);
         //entity.ai.keepDistance = entity.GetAttackDistance();
     }
     
+    //刷新装弹定时器，实时控制ui武器表滚轮进度；时间清零子弹数+1，控制ai武器表文本变化
     public void RefreshReload(float time)
     {
         if (reloadTimer > 0)
@@ -91,6 +112,7 @@ public class EntityWeaponBase : MonoBehaviour
         }
     }
 
+    //刷新攻击间隔定时器
     public void RefreshShoot(float time)
     {
         if (shootTimer > 0)
@@ -118,6 +140,7 @@ public class EntityWeaponBase : MonoBehaviour
 
     }
 
+    //普通攻击，生成一发子弹，减少子弹数量，修改ui武器表，播放音效
     public void NormalAttack()
     {
         if(cartridgeCounter >= 1)
@@ -130,7 +153,7 @@ public class EntityWeaponBase : MonoBehaviour
             AudioSystem.Instance.PlayAudio("shooting");
         }
     }
-
+    //散射攻击
     public void ScatteringAttack()
     {
         if(cartridgeCounter >= 3)
@@ -145,6 +168,8 @@ public class EntityWeaponBase : MonoBehaviour
 
         }
     }
+
+    //当武器绑定了ui武器表，就会刷新ui武器表
     public void ShowWeaponTable()
     {
         if(table != null)
@@ -154,7 +179,7 @@ public class EntityWeaponBase : MonoBehaviour
         }
     }
 
-
+    //旋转
     public void PointToMove(int x,float time)
     {
        
@@ -162,6 +187,7 @@ public class EntityWeaponBase : MonoBehaviour
 
     }
 
+    //实时更新射击定时器和装弹定时器
     private void Update()
     {
         RefreshShoot(Time.deltaTime);

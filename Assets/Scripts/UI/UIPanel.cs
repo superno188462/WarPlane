@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        UIPanel.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       UIPanel基类
+ * \note        保存对文本或按钮修改的通用功能，目前没有使用他们，只作为一个空基类使用
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -7,7 +16,7 @@ using UnityEngine.Events;
 
 public class UIPanel : MonoBehaviour
 {
-    public virtual void PrintWeaponTable(EntityBase entity) 
+    public virtual void PrintWeaponTable(EntityBase entity)
     {
     }
 

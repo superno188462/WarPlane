@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        UISystem.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       UI系统
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,9 +15,13 @@ using UnityEngine.Events;
 
 public class UISystem : Singleton<UISystem>
 {
+    //UI类预制体存放路径
     public const string UILayoutUrl = "UI/";
 
+    //布局
     public UILayout layout;
+
+    //UI系统为全局创建一个布局预制体
     private void Awake()
     {
         base.Awake();
@@ -17,6 +30,8 @@ public class UISystem : Singleton<UISystem>
     
     public void InitUILayout()
     {
+        //这里把波数的UpPanel相关数据内容放在GameControl的文本保存了
+        //没有修改成新增一个UpPanel类 
         layout = PoolSystem.Instance.GetObj(UILayoutUrl + "Layout").GetComponent<UILayout>();
         Transform trans = layout.transform.GetChild(0);//Find("UpPanel");
         //Debug.Log(trans);
@@ -55,6 +70,8 @@ public class UISystem : Singleton<UISystem>
     }
     //if(hps != null) hps.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
 
+
+    //分配文本-用于掉血飘字
     public Text CreateText()
     {
         Text text = PoolSystem.Instance.GetObj("UI/Text").GetComponent<Text>();
@@ -64,6 +81,7 @@ public class UISystem : Singleton<UISystem>
         return text;
     }
 
+    //分配ui武器表
     public GameObject CreateWeaponTable()
     {
         GameObject obj = PoolSystem.Instance.GetObj("UI/WeaponTable");
@@ -97,7 +115,7 @@ public class UISystem : Singleton<UISystem>
     public void AddButtonFunction(Button btn,string content, UnityAction action)
     {
         Text text = btn.GetComponentInChildren<Text>();
-        text.text = "123";
+        //text.text = "123";
         //Debug.Log($"{btn.name } {content} {action}");
         ChangeTextContent(text, content);
         AddButtonListen( btn,  action);

@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        UILayout.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       布局类
+ * \note        保存布局预制体下的所有需要经常使用的UIPanel类
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;

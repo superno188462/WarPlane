@@ -1,4 +1,14 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        DownPanel.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       布局中的DownPanel
+ * \note        
+ * \remarks     
+ ***********************************************/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +23,9 @@ public class DownPanel : UIPanel
         table = UISystem.Instance.FindChildByName("Content");
         //Debug.Log(table == null);
     }
+
     public override void PrintWeaponTable(EntityBase entity)
+    //public  void PrintWeaponTable(EntityBase entity)
     {
         //Debug.Log("downpanel");
         for(int i=0;i<entity.weapons.Length;i++)

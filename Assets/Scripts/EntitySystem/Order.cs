@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+﻿/***********************************************
+ * \file        Order.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       中间函数，算法公式
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -6,7 +15,7 @@ using DG.Tweening;
 
 public class Order : Singleton<Order>
 {
-    //从列表中获取路径点向量
+    //从列表中获取路径点向量，未使用
     public static Vector3 Pop(List<Vector3> list)
     {
         if (list.Count == 0) return Vector3.zero;
@@ -129,17 +138,20 @@ public class Order : Singleton<Order>
         return SetRotateDirection(angle,  unit.GetAttackDistance(), unit.currentSpeed,direction);
     }
 
+    //向预定位置移动
     public static int CollisionToPosInLine(EntityBase unit, Vector3 aimPos)
     {
         int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
         return SetAcceleration(angle);
     }
+    //向预定位置旋转
     public static int CollisionToPosInRotate(EntityBase unit, Vector3 aimPos)
     {
         int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
         return SetRotateDirection(angle);
     }
 
+    //向目标攻击，未使用
     public static void AttackToAim(EntityBase unit, EntityBase aim,out int x,out int para)
     {
         
@@ -149,9 +161,8 @@ public class Order : Singleton<Order>
         //按照和玩家旋转方向相悖的位置平移
         int angle2 = AngleOfRotation(unit.transform.position, aim.transform.position, aim.transform.eulerAngles);
         para = -SetRotateDirection(angle2);
-
-
     }
+    //向目标旋转
     public static int AttackToPosInRotate(EntityBase unit, Vector3 aimPos)
     {
         int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
@@ -181,15 +192,9 @@ public class Order : Singleton<Order>
         //RaycastHit2D hit = Physics2D.Raycast(weapon.transform.position, weapon.transform.up, 100, 1 << 8 | 1 << 9);
         RaycastHit2D[] hits = Physics2D.RaycastAll(weapon.transform.position, weapon.transform.up, 100, 1 << 8 | 1 << 9);
 
-        //Debug.Log($"当前点{weapon.transform.position} 目标点 {hit.point}");
         //Debug.DrawLine(weapon.transform.position, hit.point, Color.red, 0.01f);
         //Debug.DrawLine(weapon.transform.position,weapon.transform.position + weapon.transform.up * 10, Color.yellow, 0.01f);
-        for(int i=0;i<hits.Length;i++)
-        {
-            //Debug.Log($"{i} {hits[i].transform.name}");
-        }
-
-        //Debug.Log(hits.Length);
+        
         if (hits.Length>=2)
         {
             //Debug.Log(hits[0].transform.GetComponent<EntityBase>() == null);
@@ -214,26 +219,7 @@ public class Order : Singleton<Order>
     }
 
     #region dotween
-    //transform.DOMove(Vector2.zero, 3).OnComplete(()=>
-    //{
-    //    //爆炸
-    //    gameObject.SetActive(false);
-
-    //});
-    //transform.DOLocalMove(Vector2.up, 1).SetEase(Ease.Linear);//lerp
-
-    //Sequence seq = DOTween.Sequence();
-    //seq.Append();
-    //seq.AppendCallback();
-    //seq.AppendInterval(1);
-
-    //seq.Join();
-
-    //for (int i = 0; i < length; i++)
-    //{
-    //    seq.Append(xx)
-    //     seq.AppendInterval(0.1f);
-    //}
+    //伤害飘字
     public static void FlyToText(Graphic text)
     {
         RectTransform rt = text.rectTransform;

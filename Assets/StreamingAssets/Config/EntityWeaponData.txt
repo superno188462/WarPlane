@@ -1,0 +1,4 @@
+编号	子弹类型	攻击类型	弹夹数	装弹时间	子弹射击间隔	
+ID001	ID001	normal	5x1	1	0.5
+ID002	ID001	scattering	5x3	0.8	0.75
+ID003	ID002	normal	5x1	3	1.25

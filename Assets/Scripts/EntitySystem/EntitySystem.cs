@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        EntitySystem.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       实体工厂
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -8,17 +17,20 @@ using System;
 
 public class EntitySystem : Singleton<EntitySystem>
 {
-    
+    //WebLoad.Load(Application.streamingAssetsPath+ "/Config/AudioClipConfig.txt");
+    //字典：实体数据、实体武器数据、实体子弹数据、波数数据，存储
     public static Dictionary<string, string[]> entity;
     public static Dictionary<string, string[]> entityWeapon;
     public static Dictionary<string, string[]> entityBullet;
     public static Dictionary<string, string> waveInfo;
 
-    public const string EntityDataUrl = "Assets/Resources/EntityData/EntityData.txt";
-    public const string EntityWeaponDataUrl = "Assets/Resources/EntityData/EntityWeaponData.txt";
-    public const string EntityBulletDataUrl = "Assets/Resources/EntityData/EntityBulletData.txt";
-    public const string waveInfoUrl = "Assets/Resources/EntityData/WaveData.txt";
+    //数据文本下载路径
+    public const string EntityDataUrl = "/Config//EntityData.txt";
+    public const string EntityWeaponDataUrl = "/Config//EntityWeaponData.txt";
+    public const string EntityBulletDataUrl = "/Config//EntityBulletData.txt";
+    public const string waveInfoUrl = "/Config/WaveData.txt";
 
+    //实体下载路径
     public const string EntityUrl = "Entity/";
     public const string EntityBulletUrl = "EntityBullet/";
 
@@ -27,34 +39,39 @@ public class EntitySystem : Singleton<EntitySystem>
     public const int EntityWeaponAttrSize = 5;
     public const int EntityBulletAttrSize = 3;
 
+    //临时使用
     public GameObject tmpObj;
+    public static string str;
 
+    //为新生成的实体分配id
     public static int entityID = 0;
     public static int entityBulletID = 0;
 
     public const string NULL = "0";
 
+    //将文本中的内容按规则传入字典
     public static void FillDict(Dictionary<string, string[]> dict, string str,int size)
     {
+        //ID001   5   300 60  ID002/ID001/ID001 
         string[] strs = str.Split('\n');
         for (int i = 1; i < strs.Length; i++)
         {
             if (strs[i].Trim().Length < 3) continue;
+
             string[] strs2 = strs[i].Split('\t');
+            //第一项为实体id
             string id = strs2[0];
-            string[] attr = { };//new string[5] { NULL, NULL , NULL , NULL, NULL };
-            //Debug.Log("empty");
-            
-            //Array.ConstrainedCopy(strs, 1, attr, 0, size);
+            //后面指定数量项为属性，将其变成字符串数组传入字典
+            string[] attr = { };
             ArrayList al = new ArrayList(strs2);
             al.RemoveAt(0);
             attr = (string[])al.ToArray(typeof(string));
-            //Debug.Log("change");
-
 
             dict.Add(id,attr);
         }
     }
+
+    //实例化并初始化字典
     protected override void Awake()
     {
         base.Awake();
@@ -65,20 +82,23 @@ public class EntitySystem : Singleton<EntitySystem>
 
         InitAttrData();
     }
+
+    //初始化字典
     public static void InitAttrData()
     {
-        string str = WebLoad.Load(EntityDataUrl);
+        
+        str = WebLoad.Load(Application.streamingAssetsPath+EntityDataUrl);
         FillDict(entity, str, EntityAttrSize);
-        str = WebLoad.Load(EntityWeaponDataUrl);
+        str = WebLoad.Load(Application.streamingAssetsPath + EntityWeaponDataUrl);
         FillDict(entityWeapon, str, EntityWeaponAttrSize);
-        str = WebLoad.Load(EntityBulletDataUrl);
+        str = WebLoad.Load(Application.streamingAssetsPath + EntityBulletDataUrl);
         FillDict(entityBullet, str, EntityBulletAttrSize);
 
-        str = WebLoad.Load(waveInfoUrl);
+        str = WebLoad.Load(Application.streamingAssetsPath + waveInfoUrl);
         DecodeClass.FillDict(waveInfo, str);
     }
 
-    //设置ID
+    //设置ID,如果创建的实体是新的，则为其分配新的id号，否则返回null
     public static string SetBulletID(EntityBulletBase unit)
     {
         //Debug.Log(unit.unitID);

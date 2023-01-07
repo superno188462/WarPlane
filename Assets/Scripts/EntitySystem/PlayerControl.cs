@@ -1,4 +1,13 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        PlayerControl.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       玩家控制器
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

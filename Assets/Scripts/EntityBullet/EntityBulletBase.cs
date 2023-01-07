@@ -1,11 +1,20 @@
-﻿using System.Collections;
+﻿/***********************************************
+ * \file        EntityBulletBase.cs
+ * \author      
+ * \date        
+ * \version     
+ * \brief       子弹基类
+ * \note        
+ * \remarks     
+ ***********************************************/
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//编号 子弹类型	伤害	speed	
-//ID001	physical	2	100
-//ID002	laser		1	80
+//编号 伤害	speed	attackDistance	描述
+//ID001	1	800	10	physical
+//ID002	1	650	10	laser
 
-
+//子弹属性类，包括子弹id，子弹伤害，子弹速度，子弹攻击距离
 public class EntityBulletAttr
 {
     public string id;
@@ -17,20 +26,25 @@ public class EntityBulletAttr
         hurt = int.Parse(str[0]);
         speed = float.Parse(str[1]);
         attackDistance = float.Parse(str[2]);
-
-
     }
 }
 
 public class EntityBulletBase : MonoBehaviour
 {
+    //场景中子弹唯一id
     public string unitID;
-    public string attributionID;//属于什么战斗单位
+    //属于什么战斗单位
+    public string attributionID;
+    //回收存储路径
     public string path;
 
+    //子弹基本属性
     public EntityBulletAttr attr;
+
+    //子弹生存周期（攻击距离）
     public float life;
 
+    //实例化子弹基本属性类
     private void Awake()
     {
         attr = new EntityBulletAttr();
@@ -63,6 +77,7 @@ public class EntityBulletBase : MonoBehaviour
         transform.eulerAngles = new Vector3(0, 0, z);
     }
 
+    //设置攻击距离
     public void SetLife()
     {
         life = attr.attackDistance;
@@ -71,24 +86,25 @@ public class EntityBulletBase : MonoBehaviour
     #endregion
 
     #region 动作相关函数
-
+    //移动
     public virtual float PointToMove(float time)
     {
         return 0;
     } 
-    
+    //生存周期变化
     public virtual void RefreshLife(float time)
     {
     }
 
     #endregion
-
+    //实时移动和修改生存周期
     private void Update()
     {
         PointToMove(Time.deltaTime);
         RefreshLife(Time.deltaTime);
     }
 
+    //回收子弹
     public void PushPool()
     {
         EntitySystem.PushEntityBullet(path, this.gameObject);

@@ -24,8 +24,8 @@ public class DownPanel : UIPanel
         //Debug.Log(table == null);
     }
 
-    public override void PrintWeaponTable(EntityBase entity)
-    //public  void PrintWeaponTable(EntityBase entity)
+    //public override void PrintWeaponTable(EntityBase entity)
+    public void PrintWeaponTable(EntityBase entity)
     {
         //Debug.Log("downpanel");
         for(int i=0;i<entity.weapons.Length;i++)

@@ -26,6 +26,7 @@ public class UISystem : Singleton<UISystem>
     {
         base.Awake();
         InitUILayout();
+
     }
     
     public void InitUILayout()
@@ -124,6 +125,7 @@ public class UISystem : Singleton<UISystem>
     {
         if (btn != null)
         {
+            Debug.Log("btn.onClick.AddListener(action)");
             btn.onClick.AddListener(action);
         }
     }

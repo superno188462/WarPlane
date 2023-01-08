@@ -16,9 +16,9 @@ using UnityEngine.Events;
 
 public class UIPanel : MonoBehaviour
 {
-    public virtual void PrintWeaponTable(EntityBase entity)
-    {
-    }
+    //public virtual void PrintWeaponTable(EntityBase entity)
+    //{
+    //}
 
     protected void Start()
     {

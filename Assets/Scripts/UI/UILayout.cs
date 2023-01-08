@@ -18,5 +18,12 @@ public class UILayout : MonoBehaviour
     private void Awake()
     {
         panels = new Dictionary<string, UIPanel>();
+
     }
+
+
+    //UIPanel    <=
+    //DownPanel  PrintWeaponTable
+    //(panels[" xxx"] as DownPanel).PrintWeaponTable(null);
+
 }

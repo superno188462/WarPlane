@@ -21,6 +21,10 @@ public class GameControl : Singleton<GameControl>
     //下一波需要创建的单位
     public Dictionary<string, int> nextWaveCreate;
 
+    public List<EntityBase> list;
+    //new => list.add()
+    //die => list,remove()
+
     //波数显示的文本
     public Text text;
 
@@ -32,13 +36,22 @@ public class GameControl : Singleton<GameControl>
 
     //是否要执行下一波
     public bool next = true ;
+    //刷怪状态
+    public bool IscRefresh = false;
+    //清怪状态
+    public bool IscDie = false;
+    //增益状态，暂停状态
+    public bool IscPause = true;
 
     //增益
-    public int gainAttack = 0;
+    public int gainAttack = 0;//倍数
+    public float gainAttackAdd = 0;//值
+    
+
     protected override void Awake()
     {
         base.Awake();
-        
+
         this.gameObject.AddComponent<ResourceSystem>();
         this.gameObject.AddComponent<WebLoad>();
         
@@ -66,21 +79,32 @@ public class GameControl : Singleton<GameControl>
         PlayerControl.Instance.unit = EntitySystem.CreateEntityInCondition("ID001", transform.position, 0);
         PlayerControl.Instance.unit.SetGroup(Group.player);
         //Debug.Log($"{UISystem.Instance.layout.panels.Count}  ");
-        UISystem.Instance.layout.panels["DownPanel"].PrintWeaponTable(PlayerControl.Instance.unit);
+        (UISystem.Instance.layout.panels["DownPanel"] as DownPanel).PrintWeaponTable(PlayerControl.Instance.unit);
+
+
     }
 
     //检测玩家创建和增益ui创建
     private void Update()
     {
+
         if (changePlayer == true)
         {
             changePlayer = !changePlayer;
             SetPlayer();
         }
-        if (next == true)
+
+        if (IscRefresh == true)
+        {
+            
+        } 
+        if(IscDie == true)
         {
             CreateGainOptionUI();
-            //NextWave();
+        }
+        if(IscPause ==true)
+        {
+            NextWave();
         }
     }
 
@@ -110,7 +134,6 @@ public class GameControl : Singleton<GameControl>
     //生成敌人
     public void  CreateEnemy()
     {
-
         sum = 0;
         foreach (KeyValuePair<string ,int> p in nextWaveCreate)
         {
@@ -123,15 +146,18 @@ public class GameControl : Singleton<GameControl>
         }
     }
 
-    //展示增益ui界面
+    //展示增益ui界面,进入停止状态
     public void CreateGainOptionUI()
     {
+        IscDie = false;
+        IscPause = true;
         UISystem.Instance.FindChildByName("GainOptionPanel").GetComponentInChildren<GainOptionPanel>().ShowGainOption();
     }
 
     //下一波函数，写字典，创建敌人，修改文本
     public void NextWave()
     {
+        IscPause = false;
         //Debug.Log($"{wave}create");
         string w = wave.ToString();
         if (EntitySystem.waveInfo.ContainsKey(w))
@@ -154,6 +180,7 @@ public class GameControl : Singleton<GameControl>
     //当敌人阵亡，需要在字典中减去该单位，判断敌人是否全部阵亡
     public void Push(string id)
     {
+
         if (nextWaveCreate.ContainsKey(id))
         {
             nextWaveCreate[id] -= 1;
@@ -161,11 +188,37 @@ public class GameControl : Singleton<GameControl>
                 nextWaveCreate.Remove(id);
             if (nextWaveCreate.Count == 0)
             {
-                next = true;
+                ClearAllEnemy();
             }
         }
         sum -= 1;
         //Debug.Log($"当前波数：{wave }\n剩余敌人：{sum}");
         changeText(waves-wave+1, sum);
+
+        //combatSystem
+        // Is  Controol  逻辑is 控制器c  名字Refresh
+        //IscRefresh=true
+        //enemyNumber=12
+        //enemyNumber--   =>  IscRefresh  = enemyNumber>0 
+
+        //IscPause  //暂停
+
+        //小怪死亡判断是否杀死所有小怪                             <=
+        //enemy =>die()  => combatsystem=> UpdateCombatState()  // 判断
+        //返回是否通关波数
+        //【小怪是否全部刷新完成】  =》 【小怪是否全部死亡】=》【拉去增益进行下一波】
+        //  IscRefresh                         IscDie/next            IscPause// ClearAllEnemy  
+        //IscRefresh =true   =return false ;
+        //IscRefresh =false  => 在场小怪的存货数量
+
+
+    }
+
+
+    //清理掉所有小怪调用的事件
+    public void ClearAllEnemy()
+    {
+        next = true;
+        CreateGainOptionUI();
     }
 }

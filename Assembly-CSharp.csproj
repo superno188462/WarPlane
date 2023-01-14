@@ -754,10 +754,6 @@
       <Project>{08F242FE-11C3-7057-0D4F-12F1FEB8083F}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
-    <ProjectReference Include="Sirenix.OdinInspector.Modules.UnityMathematics.csproj">
-      <Project>{5EBB85EF-0486-B4CB-7B24-3DC68697366A}</Project>
-      <Name>Sirenix.OdinInspector.Modules.UnityMathematics</Name>
-    </ProjectReference>
     <ProjectReference Include="Sirenix.OdinInspector.CompatibilityLayer.Editor.csproj">
       <Project>{3BA32A24-1851-83B3-5A08-20DBFA483621}</Project>
       <Name>Sirenix.OdinInspector.CompatibilityLayer.Editor</Name>

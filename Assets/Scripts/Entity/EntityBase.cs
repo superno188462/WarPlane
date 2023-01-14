@@ -274,7 +274,10 @@ public class EntityBase : MonoBehaviour
             ChanegGas(y, time);
         //transform.Rotate(0, 0, 0 - x * attr.rotateSpeed  * time, Space.Self);
         ecb.rigidbody.mass = 1;
-        ecb.rigidbody.AddTorque(x * attr.rotateSpeed * 0.05f* time);
+        //ecb.rigidbody.AddTorque(x * attr.rotateSpeed * 0.05f* time);
+        if (group == Group.player)
+            Debug.Log(x * attr.rotateSpeed);
+        ecb.rigidbody.MoveRotation(ecb.rigidbody.rotation - x  * attr.rotateSpeed* time);
     }
     //力
     //public void PointToMove(float x, float y, float time)

@@ -125,7 +125,7 @@ public class UISystem : Singleton<UISystem>
     {
         if (btn != null)
         {
-            Debug.Log("btn.onClick.AddListener(action)");
+            btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(action);
         }
     }

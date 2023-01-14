@@ -53,7 +53,9 @@ public class GainOptionPanel : UIPanel
     {
         isUsed = false;
         key.gameObject.SetActive(isUsed);
-        GameControl.Instance.NextWave();    
+        GameControl.Instance.IscPause = false ;
+        GameControl.Instance.IscRefresh = true;
+
     }
     //增加攻击力增益
     public void Gain0()

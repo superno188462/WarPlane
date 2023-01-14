@@ -17,12 +17,12 @@ public class EntityColliderBase : MonoBehaviour
 {
     //绑定实体触发器、碰撞体或刚体
     protected EntityBase entity;
-    //protected Rigidbody rigidbody;
+    public Rigidbody2D rigidbody;
 
     //获取实体
     private void Awake()
     {
-        //rigidbody = GetComponentInChildren<Rigidbody>();
+        rigidbody = GetComponentInChildren<Rigidbody2D>();
         entity = GetComponentInChildren<EntityBase>();
     }
 

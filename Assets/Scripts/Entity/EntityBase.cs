@@ -272,8 +272,12 @@ public class EntityBase : MonoBehaviour
     {
         if ((currentSpeed > -attr.speed && y == -1) || (currentSpeed < attr.speed && y == 1))
             ChanegGas(y, time);
-        transform.Rotate(0, 0, 0 - x * attr.rotateSpeed  * time, Space.Self);
+        //transform.Rotate(0, 0, 0 - x * attr.rotateSpeed  * time, Space.Self);
+        ecb.rigidbody.mass = 1;
+        ecb.rigidbody.AddTorque(x * attr.rotateSpeed * 0.05f* time);
     }
+    //力
+    //public void PointToMove(float x, float y, float time)
 
     //单位平移，未使用
     public void MoveToParallel(float x, float time)
@@ -312,11 +316,19 @@ public class EntityBase : MonoBehaviour
     {
         RefreshGas(Time.deltaTime);
 
-        currentSpeed +=  accelerationOfSpeed * Time.deltaTime;
-        float v = currentSpeed * 0.01f * Time.deltaTime;
-        this.transform.position += v * transform.up;
+        //currentSpeed +=  accelerationOfSpeed * Time.deltaTime;
+        //float v = currentSpeed * 0.01f * Time.deltaTime;
+        //this.transform.position += v * transform.up;
 
-        if(hps != null) hps.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
+        ecb.rigidbody.mass = 1;
+        ecb.rigidbody.AddForce(-ecb.rigidbody.velocity.x / (0.01f * attr.speed) * transform.up);
+        ecb.rigidbody.AddForce(-ecb.rigidbody.velocity.y / (0.01f * attr.speed) * transform.up);
+        ecb.rigidbody.AddForce((gas-0.2f) * transform.up);
+        
+        if(group == Group.player)
+        Debug.Log($"速度：{ ecb.rigidbody.velocity} {ecb.rigidbody.angularVelocity}");
+
+        if (hps != null) hps.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
     }
 
 }

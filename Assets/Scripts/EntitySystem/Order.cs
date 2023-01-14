@@ -123,8 +123,8 @@ public class Order : Singleton<Order>
     {
         int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
         Vector3 direction = aimPos - unit.transform.position;
-        Debug.DrawLine(unit.transform.position, unit.transform.position + unit.transform.up * 5, Color.blue);
-        Debug.DrawLine(unit.transform.position, unit.transform.position + direction.normalized * 5, Color.red);
+        //Debug.DrawLine(unit.transform.position, unit.transform.position + unit.transform.up * 5, Color.blue);
+        //Debug.DrawLine(unit.transform.position, unit.transform.position + direction.normalized * 5, Color.red);
         return SetAcceleration(angle,unit.GetAttackDistance(),unit.currentSpeed, direction);
 
     }
@@ -245,5 +245,97 @@ public class Order : Singleton<Order>
     }
     #endregion
 
+
+    #region 画画
+    //画圆,可以提供材质
+    public static void DrawCircle(EntityWeaponBase weapon, Material m_material)
+    {
+
+    }
+    public static void ClearDrawCircle ()
+    {
+        LineRenderer line = PlayerControl.Instance.line;
+        if (line == null) return;
+        
+    }
+    public static void DrawLine(EntityWeaponBase weapon)
+    {
+        List<Vector3> vPath = new List<Vector3>();
+        float R = weapon.attackDistance;
+        float W = 0.01f;                            //宽度
+        int count = 60;
+        Vector3 start = weapon.transform.position;
+        Vector3 go =R * weapon.transform.up;
+
+        LineRenderer dynamicLine = weapon.gameObject.GetComponent<LineRenderer>();
+        if (dynamicLine == null) dynamicLine = weapon.gameObject.AddComponent<LineRenderer>();
+
+
+        for (int i = 1; i <= (count + 1); i++)
+        {
+            if (i == (count + 1))
+            {
+                //float x = Mathf.Cos(angle2) * R + v.x;
+                //float y = Mathf.Sin(angle2 * i) * R +v.y;
+                //float z = 0;
+                //vPath.Add(new Vector3(x, y, z));
+            }
+            else
+            {
+                float x = (i  ) * go.x / count;
+                float y = (i ) * go.y / count;
+                float z = 0;
+                vPath.Add(new Vector3(x, y, z));
+            }
+            dynamicLine.useWorldSpace = false;
+            dynamicLine.positionCount = vPath.Count;
+            dynamicLine.startWidth = W;
+            dynamicLine.endWidth = W;
+            dynamicLine.SetPositions(vPath.ToArray());
+        }
+    }
+    public static void DrawCircle(EntityWeaponBase weapon)
+    {
+        
+        //Debug.Log(weapon.transform.name);
+        List<Vector3> vPath = new List<Vector3>();
+        Vector3 v = weapon.transform.position - weapon.entity.transform.position;      //圆心偏移
+        float R = weapon.attackDistance;            //半径
+        float W = 0.01f;                            //宽度
+        int count = 60;                             //完成一个圆的总点数，
+        float angle = 120;                           // 准备画线的弧度
+        float angle2 = 2 * Mathf.PI / (count - 1) * angle/360;   //当前点转角，三个点形成的两段线之间的夹角
+        
+        LineRenderer line = PlayerControl.Instance.line;
+
+        
+        for (int i = 1; i <= (count + 1); i++)
+        {
+            if (i == (count + 1))
+            {
+                //float x = Mathf.Cos(angle2) * R + v.x;
+                //float y = Mathf.Sin(angle2 * i) * R +v.y;
+                //float z = 0;
+                //vPath.Add(new Vector3(x, y, z));
+            }
+            else
+            {
+                float x = Mathf.Cos(angle2 * (i+ count/4)) * R + v.x;
+                float y = Mathf.Sin(angle2 * (i+ count / 4)) * R + v.y; 
+                float z = 0;
+                vPath.Add(new Vector3(x, y, z));
+            }
+
+        }
+
+        line.useWorldSpace = false;
+        line.positionCount = vPath.Count;
+        line.startWidth = W;
+        line.endWidth = W;
+        line.SetPositions(vPath.ToArray());
+        
+        DrawLine(weapon);
+    }
+    #endregion 
 }
 

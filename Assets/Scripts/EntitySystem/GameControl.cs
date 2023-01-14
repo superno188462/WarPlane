@@ -15,7 +15,7 @@ using UnityEngine.UI;
 public class GameControl : Singleton<GameControl>
 {
     //总波数、当前波数
-    public const int waves = 2;
+    public const int waves = 3;
     public int wave = 0;
 
     //下一波需要创建的单位
@@ -32,16 +32,15 @@ public class GameControl : Singleton<GameControl>
     public int sum;
 
     //判断玩家是否被创建
-    public bool changePlayer = true;
+    public bool changePlayer ;
 
     //是否要执行下一波
-    public bool next = true ;
     //刷怪状态
-    public bool IscRefresh = false;
+    public bool IscRefresh ;
     //清怪状态
-    public bool IscDie = false;
+    public bool IscDie ;
     //增益状态，暂停状态
-    public bool IscPause = true;
+    public bool IscPause ;
 
     //增益
     public int gainAttack = 0;//倍数
@@ -51,43 +50,34 @@ public class GameControl : Singleton<GameControl>
     protected override void Awake()
     {
         base.Awake();
-
         this.gameObject.AddComponent<ResourceSystem>();
         this.gameObject.AddComponent<WebLoad>();
-        
-
         this.gameObject.AddComponent<Order>();
         this.gameObject.AddComponent<PoolSystem>();
         this.gameObject.AddComponent<AudioSystem>();
-
         this.gameObject.AddComponent<ParticleSystemSystem>();
-
-
         this.gameObject.AddComponent<UISystem>();
         this.gameObject.AddComponent<EntitySystem>();
-
         this.gameObject.AddComponent<PlayerControl>();
-
-        
         nextWaveCreate = new Dictionary<string, int>();
 
+        changePlayer = true;
+        IscRefresh = true;
+        IscDie = false;
+        IscPause = false;
     }
 
     //创建玩家，绘制武器表ui
     public void SetPlayer()
     {
-        PlayerControl.Instance.unit = EntitySystem.CreateEntityInCondition("ID001", transform.position, 0);
+        EntityBase unit = EntitySystem.CreateEntityInCondition("ID001", transform.position, 0);
+        PlayerControl.Instance.UnitEnter(unit);
         PlayerControl.Instance.unit.SetGroup(Group.player);
-        //Debug.Log($"{UISystem.Instance.layout.panels.Count}  ");
-        (UISystem.Instance.layout.panels["DownPanel"] as DownPanel).PrintWeaponTable(PlayerControl.Instance.unit);
+        }
 
-
-    }
-
-    //检测玩家创建和增益ui创建
+    //检测不同状态
     private void Update()
     {
-
         if (changePlayer == true)
         {
             changePlayer = !changePlayer;
@@ -96,15 +86,16 @@ public class GameControl : Singleton<GameControl>
 
         if (IscRefresh == true)
         {
-            
+            NextWave();
         } 
         if(IscDie == true)
         {
+            Debug.Log("CreateGainOptionUI");
             CreateGainOptionUI();
         }
         if(IscPause ==true)
         {
-            NextWave();
+            
         }
     }
 
@@ -129,6 +120,7 @@ public class GameControl : Singleton<GameControl>
 
             nextWaveCreate[id] = num;
         }
+        
     }
 
     //生成敌人
@@ -144,6 +136,7 @@ public class GameControl : Singleton<GameControl>
                 EntitySystem.CreateEntityInArea(p.Key, pos, 20);
             }
         }
+        IscDie = false;
     }
 
     //展示增益ui界面,进入停止状态
@@ -157,8 +150,7 @@ public class GameControl : Singleton<GameControl>
     //下一波函数，写字典，创建敌人，修改文本
     public void NextWave()
     {
-        IscPause = false;
-        //Debug.Log($"{wave}create");
+        IscRefresh = false;
         string w = wave.ToString();
         if (EntitySystem.waveInfo.ContainsKey(w))
         {
@@ -169,12 +161,13 @@ public class GameControl : Singleton<GameControl>
         {
             return;
         }
+
         CreateEnemy();
 
         wave += 1;
-        next = false;
 
         changeText(waves - wave+1, sum);
+        
     }
 
     //当敌人阵亡，需要在字典中减去该单位，判断敌人是否全部阵亡
@@ -218,7 +211,6 @@ public class GameControl : Singleton<GameControl>
     //清理掉所有小怪调用的事件
     public void ClearAllEnemy()
     {
-        next = true;
-        CreateGainOptionUI();
+        IscDie = true;
     }
 }

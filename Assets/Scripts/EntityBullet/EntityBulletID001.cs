@@ -16,8 +16,10 @@ public class EntityBulletID001 : EntityBulletBase
     //移动
     public override float PointToMove(float time)
     {
-        float v = attr.speed / 100 * time;
+        float v = bulletData.bulletSpeed * time;
+        //Debug.Log(v/time);
         transform.position += v * transform.up;
+        //transform.position=Vector3.MoveTowards(transform.position,目标点，每个逻辑帧能走的距离)；
         return v;
     }
 
@@ -25,7 +27,7 @@ public class EntityBulletID001 : EntityBulletBase
     public override void RefreshLife(float time)
     {
         //Debug.Log($"{life} {PointToMove(time)}");
-        life -= PointToMove(time);
+        life -= time;
         if (life < 0)
         {
             PushPool();

@@ -29,7 +29,8 @@ public class EntityColliderBase : MonoBehaviour
     //碰撞成功函数，扣血+ui飘字
     public void ColliderSuccess(EntityBase entity,int hurt)
     {
-        int tmpHp = entity.currentHP - hurt;
+        int tmpHp = entity.entityData.hp - hurt;
+        //Debug.Log(tmpHp);
         entity.SetHp(tmpHp);
 
         Text text = UISystem.Instance.CreateText();
@@ -45,12 +46,12 @@ public class EntityColliderBase : MonoBehaviour
         if(other.gameObject.layer == 9)
         {
             EntityBulletBase bullet = other.gameObject.GetComponentInParent<EntityBulletBase>();
-
+            if (bullet == null) return;
             //自己发射的子弹
             if (bullet.attributionID == entity.unitID) return;
 
             //伤害为子弹伤害+增益
-            int hurt = bullet.attr.hurt;
+            int hurt = bullet.bulletData.bulletHurt;
             if(bullet.attributionID == PlayerControl.Instance.unit.unitID)
                 hurt+=GameControl.Instance.gainAttack;
 
@@ -63,7 +64,9 @@ public class EntityColliderBase : MonoBehaviour
         if (other.gameObject.layer == 8)
         {
             EntityBase enemy = other.gameObject.GetComponentInParent<EntityBase>();
-            if(enemy.group == Group.player && entity.attr.id == "ID002")
+            //Debug.Log($"{enemy == null} { entity == null}");
+            if (enemy == null) return;
+            if(enemy.group == EntityGroup.Player && entity.entityData.id == "ID002")
             {
                 ColliderSuccess(entity, 1);
                 entity.PushPool();

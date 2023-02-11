@@ -20,6 +20,7 @@ public class GameControl : Singleton<GameControl>
 
     //下一波需要创建的单位
     public Dictionary<string, int> nextWaveCreate;
+    
 
     public List<EntityBase> list;
     //new => list.add()
@@ -50,6 +51,7 @@ public class GameControl : Singleton<GameControl>
     protected override void Awake()
     {
         base.Awake();
+        this.gameObject.AddComponent<Mathc>(); 
         this.gameObject.AddComponent<ResourceSystem>();
         this.gameObject.AddComponent<WebLoad>();
         this.gameObject.AddComponent<Order>();
@@ -72,7 +74,7 @@ public class GameControl : Singleton<GameControl>
     {
         EntityBase unit = EntitySystem.CreateEntityInCondition("ID001", transform.position, 0);
         PlayerControl.Instance.UnitEnter(unit);
-        PlayerControl.Instance.unit.SetGroup(Group.player);
+        PlayerControl.Instance.unit.SetGroup(EntityGroup.Player);
         }
 
     //检测不同状态
@@ -90,7 +92,7 @@ public class GameControl : Singleton<GameControl>
         } 
         if(IscDie == true)
         {
-            Debug.Log("CreateGainOptionUI");
+           // Debug.Log("CreateGainOptionUI");
             CreateGainOptionUI();
         }
         if(IscPause ==true)
@@ -173,18 +175,18 @@ public class GameControl : Singleton<GameControl>
     //当敌人阵亡，需要在字典中减去该单位，判断敌人是否全部阵亡
     public void Push(string id)
     {
-
+        //Debug.Log(id);
         if (nextWaveCreate.ContainsKey(id))
         {
             nextWaveCreate[id] -= 1;
             if (nextWaveCreate[id] == 0)
                 nextWaveCreate.Remove(id);
-            if (nextWaveCreate.Count == 0)
-            {
-                ClearAllEnemy();
-            }
         }
         sum -= 1;
+        if (sum == 0)
+        {
+            ClearAllEnemy();
+        }
         //Debug.Log($"当前波数：{wave }\n剩余敌人：{sum}");
         changeText(waves-wave+1, sum);
 

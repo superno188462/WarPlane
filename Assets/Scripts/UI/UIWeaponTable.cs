@@ -17,9 +17,9 @@ public class UIWeaponTable : MonoBehaviour
     //最大子弹数
     public int max;
     //子弹类型
-    public string bullet;
+    //public string bullet;
     //子弹类型文本
-    public Text bulletText;
+    //public Text bulletText;
     //子弹数量文本
     public Text cartridgeText;
     //子弹装弹进度滚轮
@@ -28,7 +28,7 @@ public class UIWeaponTable : MonoBehaviour
     void Awake()
     {
         Text[] tmp = transform.GetComponentsInChildren<Text>();
-        bulletText = tmp[0];
+        //bulletText = tmp[0];
         cartridgeText = tmp[1];
         //Debug.Log($"{bulletText == null} {cartridgeText == null}");
 
@@ -45,10 +45,10 @@ public class UIWeaponTable : MonoBehaviour
     public void FreshWeapon(EntityWeaponBase weapon)
     {
         //Debug.Log(weapon == null);
-        bullet = weapon.attr.bullet;
-        max = weapon.attr.cartridge;
+        //bullet = weapon.attr.bullet;
+        max = weapon.weaponData.bulletCountMax;
 
-        bulletText.text = bullet;
+        //bulletText.text = bullet;
         UpdateBulletNum(max);
     }
     //更新子弹数文本

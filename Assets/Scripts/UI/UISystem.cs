@@ -17,6 +17,7 @@ public class UISystem : Singleton<UISystem>
 {
     //UI类预制体存放路径
     public const string UILayoutUrl = "UI/";
+    public Dictionary<EntityBase, SliderState> allSliders;
 
     //布局
     public UILayout layout;
@@ -26,6 +27,7 @@ public class UISystem : Singleton<UISystem>
     {
         base.Awake();
         InitUILayout();
+        allSliders = new Dictionary<EntityBase, SliderState>();
 
     }
     
@@ -61,13 +63,13 @@ public class UISystem : Singleton<UISystem>
 
     #region Create
     //分配血条
-    public Slider CreateSlider()
+    public void CreateHPSlider(EntityBase entity)
     {
-        Slider hps =  PoolSystem.Instance.GetObj("UI/Slider").GetComponent<Slider>();
+        SliderState hps =  PoolSystem.Instance.GetObj("UI/SliderState").GetComponent<SliderState>();
         //Debug.Log(layout == null);
-        hps.transform.parent =  layout.transform;
+        hps.transform.parent = FindChildByName("HpSilderTF");
         hps.transform.localPosition = Vector3.zero;
-        return hps;
+        allSliders.Add(entity, hps);
     }
     //if(hps != null) hps.transform.position = Camera.main.WorldToScreenPoint(transform.position + new Vector3(0,2,0));
 
@@ -95,9 +97,11 @@ public class UISystem : Singleton<UISystem>
     #endregion
 
     #region push
-    public void PushSlider(Slider hps)
+    public void PushHPSlider(EntityBase entity)
     {
-        PoolSystem.Instance.PushObj("UI/Slider", hps.gameObject);
+        PoolSystem.Instance.PushObj("UI/Slider", allSliders[entity].gameObject);
+        allSliders.Remove(entity);
+        
     }
 
     
@@ -136,5 +140,31 @@ public class UISystem : Singleton<UISystem>
             text.text = content;
         }
     }
+    public void ChangeSliderShow(EntityBase entity,float fill1,float fill2)
+    {
+        //Debug.Log($"{fill1} {fill2}");
+    }
     #endregion
+
+    private void Update()
+    {
+        float time = Time.deltaTime;
+        float hpV, spV;
+        foreach (KeyValuePair<EntityBase, SliderState> kv in allSliders)
+        {
+            if ((float)kv.Key.entityData.maxsp == 0)
+            {
+                spV = 0;
+            }
+            else 
+            {
+                spV = (float)kv.Key.entityData.sp / (float)kv.Key.entityData.maxsp;
+            }
+            Debug.Log($"{kv.Key.entityData.hp} {kv.Key.entityData.maxhp} {(float)kv.Key.entityData.hp / (float)kv.Key.entityData.maxhp}");
+            hpV = (float)kv.Key.entityData.hp / (float)kv.Key.entityData.maxhp;
+            kv.Value.refreshHps(hpV, spV);
+            kv.Value.ParticleHps(time);
+            kv.Value.refreshPostion(kv.Key.transform.position);
+        }
+    }
 }

@@ -19,15 +19,15 @@ public class EntitySystem : Singleton<EntitySystem>
 {
     //WebLoad.Load(Application.streamingAssetsPath+ "/Config/AudioClipConfig.txt");
     //字典：实体数据、实体武器数据、实体子弹数据、波数数据，存储
-    public static Dictionary<string, string[]> entity;
-    public static Dictionary<string, string[]> entityWeapon;
-    public static Dictionary<string, string[]> entityBullet;
+    public static Dictionary<string, string> entity;
+    public static Dictionary<string, string> entityWeapon;
+    //public static Dictionary<string, string[]> entityBullet;
     public static Dictionary<string, string> waveInfo;
 
     //数据文本下载路径
     public const string EntityDataUrl = "/Config/EntityData.txt";
     public const string EntityWeaponDataUrl = "/Config//EntityWeaponData.txt";
-    public const string EntityBulletDataUrl = "/Config//EntityBulletData.txt";
+    //public const string EntityBulletDataUrl = "/Config//EntityBulletData.txt";
     public const string waveInfoUrl = "/Config/WaveData.txt";
 
     //实体下载路径
@@ -35,9 +35,9 @@ public class EntitySystem : Singleton<EntitySystem>
     public const string EntityBulletUrl = "EntityBullet/";
 
     //表格中实体属性数据数
-    public const int EntityAttrSize = 4;
-    public const int EntityWeaponAttrSize = 5;
-    public const int EntityBulletAttrSize = 3;
+    //public const int EntityAttrSize = 4;
+    //public const int EntityWeaponAttrSize = 5;
+    //public const int EntityBulletAttrSize = 3;
 
     //临时使用
     public GameObject tmpObj;
@@ -50,24 +50,16 @@ public class EntitySystem : Singleton<EntitySystem>
     public const string NULL = "0";
 
     //将文本中的内容按规则传入字典
-    public static void FillDict(Dictionary<string, string[]> dict, string str,int size)
+    public static void FillDict(Dictionary<string, string> dict, string str)
     {
-        //ID001   5   300 60  ID002/ID001/ID001 
         string[] strs = str.Split('\n');
         for (int i = 1; i < strs.Length; i++)
         {
             if (strs[i].Trim().Length < 3) continue;
 
-            string[] strs2 = strs[i].Split('\t');
-            //第一项为实体id
-            string id = strs2[0];
-            //后面指定数量项为属性，将其变成字符串数组传入字典
-            string[] attr = { };
-            ArrayList al = new ArrayList(strs2);
-            al.RemoveAt(0);
-            attr = (string[])al.ToArray(typeof(string));
-
-            dict.Add(id,attr);
+            string id = strs[i].Split('\t')[0];
+            dict.Add(id, strs[i]);
+            //Debug.Log($"{id} {strs[i]}");
         }
     }
 
@@ -75,9 +67,9 @@ public class EntitySystem : Singleton<EntitySystem>
     protected override void Awake()
     {
         base.Awake();
-        entity = new Dictionary<string, string[]>();
-        entityWeapon = new Dictionary<string, string[]>();
-        entityBullet = new Dictionary<string, string[]>();
+        entity = new Dictionary<string, string>();
+        entityWeapon = new Dictionary<string, string>();
+        //entityBullet = new Dictionary<string, string[]>();
         waveInfo = new Dictionary<string, string>();
 
         InitAttrData();
@@ -88,11 +80,11 @@ public class EntitySystem : Singleton<EntitySystem>
     {
         
         str = WebLoad.Load(Application.streamingAssetsPath+EntityDataUrl);
-        FillDict(entity, str, EntityAttrSize);
+        FillDict(entity, str);
         str = WebLoad.Load(Application.streamingAssetsPath + EntityWeaponDataUrl);
-        FillDict(entityWeapon, str, EntityWeaponAttrSize);
-        str = WebLoad.Load(Application.streamingAssetsPath + EntityBulletDataUrl);
-        FillDict(entityBullet, str, EntityBulletAttrSize);
+        FillDict(entityWeapon, str);
+        //str = WebLoad.Load(Application.streamingAssetsPath + EntityBulletDataUrl);
+        //FillDict(entityBullet, str, EntityBulletAttrSize);
 
         str = WebLoad.Load(Application.streamingAssetsPath + waveInfoUrl);
         DecodeClass.FillDict(waveInfo, str);
@@ -127,9 +119,13 @@ public class EntitySystem : Singleton<EntitySystem>
     {
         return PoolSystem.Instance.GetObj(EntityUrl + number).GetComponent<EntityBase>();
     }
-    public static EntityBulletBase CreateEntityBullet(string number)
+    //public static EntityBulletBase CreateEntityBullet(string number)
+    //{
+    //    return PoolSystem.Instance.GetObj(EntityBulletUrl + number).GetComponent<EntityBulletBase>();
+    //}
+    public static EntityBulletBase CreateEntityBullet(EntityBulletData bulletData)
     {
-        return PoolSystem.Instance.GetObj(EntityBulletUrl + number).GetComponent<EntityBulletBase>();
+        return PoolSystem.Instance.GetObj(EntityBulletUrl + "ID001").GetComponent<EntityBulletBase>();
     }
 
     //删除单位
@@ -146,18 +142,20 @@ public class EntitySystem : Singleton<EntitySystem>
     public static EntityBase CreateEntityInCondition(string number, Vector3 pos, float z)
     {
         string url = EntityUrl + number;
-
         EntityBase unit = CreateEntity(number);
-        unit.Init(SetEntityID(unit), url, number ,entity[number], pos, z);
+        unit.Init(SetEntityID(unit), url, entity[number], pos, z);
         return unit;
     }
 
-    public static EntityBulletBase CreateEntityBulletInCondition(string number, string belong, Vector3 pos, float z)
+    public static EntityBulletBase CreateEntityBulletInCondition(EntityBulletData bulletData, string belong, Vector3 pos, float z)
     {
+        //Debug.Log("attck");
+        string number = "ID001";
         string url = EntityBulletUrl + number;
 
-        EntityBulletBase unit = CreateEntityBullet(number);
-        unit.Init(SetBulletID(unit), belong,  url, entityBullet[number], pos, z);
+        EntityBulletBase unit = CreateEntityBullet(bulletData);
+        //Debug.Log(unit == null);
+        unit.Init(SetBulletID(unit), belong,  url, bulletData, pos, z);
         return unit;
     }
 

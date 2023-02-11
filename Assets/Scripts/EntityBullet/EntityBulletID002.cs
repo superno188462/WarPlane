@@ -16,14 +16,13 @@ public class EntityBulletID002 : EntityBulletBase
     //移动
     public override float PointToMove(float time)
     {
-        float v = attr.speed / 50 * time;
-        transform.position += v * transform.up;
-        return v;
+       
+        return 0;
     }
     //修改生存周期
     public override void RefreshLife(float time)
     {
-        life -= PointToMove(time);
+        life -= time;
         if (life < 0)
         {
             PushPool();

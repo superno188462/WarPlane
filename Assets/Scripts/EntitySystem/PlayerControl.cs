@@ -17,22 +17,24 @@ public class PlayerControl : Singleton<PlayerControl>
     //public Dictionary<string, EntityBase> playerUnit;
     public EntityBase unit;
     public EntityWeaponBase weapon;
-    public LineRenderer line;
+    //public LineRenderer line;
 
     protected override void Awake()
     {
         base.Awake();
-        line = null;
+        //line = null;
         //playerUnit = new Dictionary<string, EntityBase>();
     }
     public void UnitEnter(EntityBase unitIn)
     {
         unit = unitIn;
-        line = null;
-        line = unit.gameObject.GetComponent<LineRenderer>();
-        if (line == null) line=unit.gameObject.AddComponent<LineRenderer>();
+        ChangeWeapon(0);
+        //Debug.Log(unit == null);
+        //line = null;
+        //line = unit.gameObject.GetComponent<LineRenderer>();
+        //if (line == null) line=unit.gameObject.AddComponent<LineRenderer>();
 
-        
+
         if (unit.weapons != null)
         {
             weapon = PlayerControl.Instance.unit.weapons[0];
@@ -68,7 +70,7 @@ public class PlayerControl : Singleton<PlayerControl>
     public void UnitRightTrun(Vector3 aimPos) 
     {
         //Debug.Log($"{aimPos} {Camera.main.ScreenToWorldPoint(aimPos)}{unit.transform.position}");
-        int x = Order.MoveToPosInRotate(unit, Camera.main.ScreenToWorldPoint(aimPos));
+        int x = Order.MoveToPosInRotate(unit, Camera.main.ScreenToWorldPoint(aimPos),0);
         unit.PointToMove(x, 0, Time.deltaTime);
     }
     public void WeaponRightTrun(Vector3 aimPos)
@@ -82,15 +84,16 @@ public class PlayerControl : Singleton<PlayerControl>
     {
         if (unit.weapons.Length>i)
         {
-            Order.ClearDrawCircle();
+            
             weapon = unit.weapons[i];
+            if (weapon != null) Order.Draw(weapon);
         }
     }
     void Update()
     {
         if (unit == null) return ;
         if (unit.ai.isActive == true) unit.ai.isActive = false;
-        if (weapon != null) Order.DrawCircle(weapon);
+        if (weapon != null) Order.DrawLine(weapon);
         //加速
         if (Input.GetKeyDown(KeyCode.W)) MoveStart();
         
@@ -105,11 +108,17 @@ public class PlayerControl : Singleton<PlayerControl>
 
         //j键或鼠标左键攻击，鼠标右键旋转到指定方向
         if (Input.GetKeyDown(KeyCode.J)) Attack();
-        if (Input.GetMouseButtonDown(0)) Attack();
-        if (Input.GetMouseButton(1)) WeaponRightTrun(Input.mousePosition);
+        if (Input.GetMouseButton(0)) Attack();
+        //if (Input.GetMouseButton(1)) 
+        WeaponRightTrun(Input.mousePosition);
         if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeWeapon(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeWeapon(1);
         if (Input.GetKeyDown(KeyCode.Alpha3)) ChangeWeapon(2);
+
+        //if (Input.GetAxis("Mouse ScrollWheel")!=0) Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+        if (Input.GetAxis("Mouse ScrollWheel") >0) CameraSystem.Instance.ChangeCameraSize(true);
+        if (Input.GetAxis("Mouse ScrollWheel") <0) CameraSystem.Instance.ChangeCameraSize(false);
+        if (Input.GetKey("left shift")) CameraSystem.Instance.FollowTarget(unit.GetComponent<Transform>());
 
 
     }

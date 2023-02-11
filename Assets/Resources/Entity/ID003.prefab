@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 341625782469648901}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7009922, y: 0.6024652, z: 1}
   m_Children:
   - {fileID: 5547567117750205793}
@@ -109,6 +109,7 @@ MonoBehaviour:
   ecb: {fileID: 0}
   ai: {fileID: 0}
   engines: []
+  hps: {fileID: 0}
   group: 0
   currentHP: 0
   currentSpeed: 0
@@ -127,6 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: becd0cd3380fa554a8c34a7cb238d6bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rigidbody: {fileID: 0}
 --- !u!50 &2157228940424367916
 Rigidbody2D:
   serializedVersion: 4
@@ -140,7 +142,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 1
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -179,6 +181,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ai: {fileID: 0}
+  attackTimer: 5
+  attackState: 0
 --- !u!1 &401686973418601513
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +228,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entity: {fileID: 0}
+  Drawline: {fileID: 0}
+  table: {fileID: 0}
   shootTimer: 0
   reloadTimer: 0
   cartridgeCounter: 0

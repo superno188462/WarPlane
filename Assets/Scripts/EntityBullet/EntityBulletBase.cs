@@ -39,20 +39,14 @@ public class EntityBulletBase : MonoBehaviour
     public string path;
 
     //子弹基本属性
-    public EntityBulletAttr attr;
+    public EntityBulletData bulletData;
+    public float life;//存活时间
 
-    //子弹生存周期（攻击距离）
-    public float life;
 
-    //实例化子弹基本属性类
-    private void Awake()
-    {
-        attr = new EntityBulletAttr();
-    }
 
     //初始化
     //参数：编号，路径，属性，坐标transform，旋转角
-    public void Init(string id, string belong, string url, string[] str, Vector3 pos, float z)
+    public void Init(string id, string belong, string url, EntityBulletData data, Vector3 pos, float z)
     {
         if(id != null) unitID = id;
         if(belong != null) attributionID = belong;
@@ -62,8 +56,10 @@ public class EntityBulletBase : MonoBehaviour
         SetPosition(pos);
         SetDirection(z);
 
+        
+
         //设置属性
-        attr.SetAttr(str);
+        bulletData = data;
         SetLife();
     }
 
@@ -80,7 +76,8 @@ public class EntityBulletBase : MonoBehaviour
     //设置攻击距离
     public void SetLife()
     {
-        life = attr.attackDistance;
+        life = bulletData.attackDistance / bulletData.bulletSpeed;
+        //Debug.Log(life);
     }
 
     #endregion
@@ -98,7 +95,7 @@ public class EntityBulletBase : MonoBehaviour
 
     #endregion
     //实时移动和修改生存周期
-    private void Update()
+    private void FixedUpdate()
     {
         PointToMove(Time.deltaTime);
         RefreshLife(Time.deltaTime);

@@ -28,7 +28,8 @@ public class Order : Singleton<Order>
     //需要旋转到的角度
     public static float DirectionZ(Vector3 v)
     {
-        float z = Vector3.Angle(v, Vector3.up);//距离目标的欧拉角
+        Vector3 tmp =  new Vector3(v.x, v.y, 0);
+        float z = Vector3.Angle(tmp,  Vector3.up);//距离目标的欧拉角
 
         if (v.x > 0)
         {
@@ -51,16 +52,31 @@ public class Order : Singleton<Order>
         }
         return p;
     }
+    //归一化角度，使用角度之前将其设置成指定格式,均为顺时针旋转0-360度
+    public static float NoramlZ(float p)
+    {
+        while (p < 0)
+        {
+            p = p + 360;
+        }
+        while (p >= 360)
+        {
+            p -= 360;
+        }
+        return p;
+    }
 
     //计算方向向量和相关角度
     public static int AngleOfRotation(Vector3 aimPos, Vector3 thisPos, Vector3 thisRotate)
     {
         Vector3 direction = aimPos - thisPos;//方向向量
 
-        float z = DirectionZ(direction);
-        float currentZ = CurrentZ(thisRotate.z);
 
-        return (int)(z - currentZ + 360) % 360;
+        float z = DirectionZ(direction);
+        float currentZ = NoramlZ(thisRotate.z);
+
+        if(z>=currentZ) return (int)(z - currentZ) % 360;
+        return (int)( 360+z- currentZ) % 360;
     }
     #endregion
 
@@ -69,7 +85,7 @@ public class Order : Singleton<Order>
     public static int SetAcceleration(int angle)
     {
         int y = 0;//加速参数
-        if (angle > 90 && angle < 180)
+        if (angle > 90 && angle < 270)
         {
             y = -1;
         }
@@ -81,7 +97,7 @@ public class Order : Singleton<Order>
     }
 
     //根据旋转角度、保持距离、当前速度 确定加速度参数的变化（接近目标变化）
-    public static int SetAcceleration(int angle,float keepDistance, float currentSpeed,Vector3 direction)
+    public static int SetAcceleration(int angle,float keepDistance,Vector3 direction)
     {
         int y = SetAcceleration(angle);
         return y;
@@ -106,7 +122,7 @@ public class Order : Singleton<Order>
     }
 
     //根据旋转角度、保持距离、当前速度 确定旋转方向参数的变化(接近目标变化)
-    public static int SetRotateDirection(int angle, float keepDistance, float currentSpeed, Vector3 direction)
+    public static int SetRotateDirection(int angle, float keepDistance, Vector3 direction)
     {
         int x = SetRotateDirection(angle);
         if (direction.magnitude < keepDistance)
@@ -125,7 +141,7 @@ public class Order : Singleton<Order>
         Vector3 direction = aimPos - unit.transform.position;
         //Debug.DrawLine(unit.transform.position, unit.transform.position + unit.transform.up * 5, Color.blue);
         //Debug.DrawLine(unit.transform.position, unit.transform.position + direction.normalized * 5, Color.red);
-        return SetAcceleration(angle,unit.GetAttackDistance(),unit.currentSpeed, direction);
+        return SetAcceleration(angle,unit.GetAttackDistance(), direction);
 
     }
 
@@ -135,7 +151,18 @@ public class Order : Singleton<Order>
         //旋转判断
         int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
         Vector3 direction = aimPos - unit.transform.position;
-        return SetRotateDirection(angle,  unit.GetAttackDistance(), unit.currentSpeed,direction);
+        //if (unit.group == EntityGroup.Player)
+            //Debug.Log($"{unit.transform.eulerAngles} {angle} {direction} ");
+        return SetRotateDirection(angle,  unit.GetAttackDistance(),direction);
+    }
+
+    public static int MoveToPosInRotate(EntityBase unit, Vector3 aimPos,float x)
+    {
+        //旋转判断
+        int angle = AngleOfRotation(aimPos, unit.transform.position, unit.transform.eulerAngles);
+        Vector3 direction = aimPos - unit.transform.position;
+       
+        return SetRotateDirection(angle, x, direction);
     }
 
     //向预定位置移动
@@ -176,8 +203,36 @@ public class Order : Singleton<Order>
     {
         //旋转判断
         int angle = AngleOfRotation(aimPos, weapon.transform.position, weapon.transform.eulerAngles);
-        return SetRotateDirection(angle);
+        //Debug.Log($"draw{weapon.transform.position} {weapon.transform.up * 5} {weapon.transform.position + weapon.transform.up * 5}");
+        Debug.DrawLine(weapon.transform.position, weapon.transform.position + Vector3.Normalize( new Vector3(weapon.transform.up.x, weapon.transform.up.y,0))  * 10, Color.blue);
+        //Debug.Log(Vector3.magnitude);
+        //if (weapon.entity.group == Group.player)
+        //    Debug.Log($"{aimPos} {weapon.transform.position} {weapon.transform.eulerAngles} {weapon.entity.transform.eulerAngles}");
+        
+        //预旋转方向/当前旋转方向
+        int x = SetRotateDirection(angle);
+        
+        float tmp = Order.NoramlZ(weapon.transform.eulerAngles.z - weapon.entity.transform.eulerAngles.z);
+        //Debug.Log($"{weapon.transform.eulerAngles.z} {weapon.entity.transform.eulerAngles.z} {tmp}");
+        if (x == 1)
+        {
+            if (tmp > 180 && tmp < 360 - weapon.entity.entityData.rightR)
+            {
+                return 0;
+            }
+        }
+        else if(x==-1)
+        {
+            if (tmp > weapon.entity.entityData.leftR && tmp <= 180)
+            {
+                return 0;
+            }
+        }
+        
+        //Debug.Log($"{weapon.transform.eulerAngles} {x}");
+        return x;
     }
+
 
     //向目标攻击
     public static void Attack(EntityWeaponBase weapon)
@@ -247,52 +302,66 @@ public class Order : Singleton<Order>
 
 
     #region 画画
+    public static void Draw(EntityWeaponBase weapon)
+    {
+        //Debug.Log("draw");
+        ClearDrawCircle(weapon);
+        DrawLine(weapon);
+        DrawCircle(weapon);
+    }
     //画圆,可以提供材质
     public static void DrawCircle(EntityWeaponBase weapon, Material m_material)
     {
 
     }
-    public static void ClearDrawCircle ()
+    public static void ClearDrawCircle (EntityWeaponBase weapon)
     {
-        LineRenderer line = PlayerControl.Instance.line;
-        if (line == null) return;
+        for(int i=0;i<weapon.entity.weapons.Length;i++)
+        {
+            weapon.entity.weapons[i].Drawline. SetActive(false);
+        }
+         return;
         
     }
     public static void DrawLine(EntityWeaponBase weapon)
     {
+        //Vector3.Normalize()
         List<Vector3> vPath = new List<Vector3>();
-        float R = weapon.attackDistance;
+        float R = weapon.bulletData.attackDistance;
         float W = 0.01f;                            //宽度
         int count = 60;
-        Vector3 start = weapon.transform.position;
-        Vector3 go =R * weapon.transform.up;
+        Vector3 v = weapon.transform.position;// - weapon.entity.transform.position;
+        Vector3 up = weapon.transform.up;// + new Vector3(weapon.entity.transform.up.x, weapon.entity.transform.up.y, 0);
+        Vector3 go = R * up;
+        //Debug.Log(go.magnitude);
+        //Debug.Log(DirectionZ(weapon.transform.up));
+        //Debug.Log($"RRRRRR: {R}");
+        weapon.Drawline.SetActive(true);
+        GameObject obj = weapon.Drawline.transform.GetChild(0).gameObject;
+        LineRenderer dynamicLine = obj.GetComponent<LineRenderer>();
+        if (dynamicLine == null) dynamicLine = obj.AddComponent<LineRenderer>();
 
-        LineRenderer dynamicLine = weapon.gameObject.GetComponent<LineRenderer>();
-        if (dynamicLine == null) dynamicLine = weapon.gameObject.AddComponent<LineRenderer>();
 
-
-        for (int i = 1; i <= (count + 1); i++)
+        for (int i = 1; i < count; i++)
         {
-            if (i == (count + 1))
-            {
-                //float x = Mathf.Cos(angle2) * R + v.x;
-                //float y = Mathf.Sin(angle2 * i) * R +v.y;
-                //float z = 0;
-                //vPath.Add(new Vector3(x, y, z));
-            }
-            else
-            {
-                float x = (i  ) * go.x / count;
-                float y = (i ) * go.y / count;
+            
+                float x = (i) * go.x / count + v.x;
+                float y = (i) * go.y / count + v.y;
                 float z = 0;
                 vPath.Add(new Vector3(x, y, z));
+            if (i == count-1)
+            {
+                //Debug.Log($"{DirectionZ(weapon.entity.transform.up)}");
+                //Debug.Log($"{DirectionZ(weapon.transform.up)} {weapon.transform.position}{10*weapon.transform.up} {weapon.transform.position+10* weapon.transform.up}");
+                //Debug.Log($"{DirectionZ(new Vector3(x, y, z)- v)} {v} {new Vector3(x, y, z) - v} {new Vector3(x, y, z)}");
             }
-            dynamicLine.useWorldSpace = false;
+        }
+            dynamicLine.useWorldSpace = true;
             dynamicLine.positionCount = vPath.Count;
             dynamicLine.startWidth = W;
             dynamicLine.endWidth = W;
             dynamicLine.SetPositions(vPath.ToArray());
-        }
+        
     }
     public static void DrawCircle(EntityWeaponBase weapon)
     {
@@ -300,31 +369,39 @@ public class Order : Singleton<Order>
         //Debug.Log(weapon.transform.name);
         List<Vector3> vPath = new List<Vector3>();
         Vector3 v = weapon.transform.position - weapon.entity.transform.position;      //圆心偏移
-        float R = weapon.attackDistance;            //半径
+        float R = weapon.bulletData.attackDistance;            //半径
         float W = 0.01f;                            //宽度
         int count = 60;                             //完成一个圆的总点数，
-        float angle = 120;                           // 准备画线的弧度
-        float angle2 = 2 * Mathf.PI / (count - 1) * angle/360;   //当前点转角，三个点形成的两段线之间的夹角
-        
-        LineRenderer line = PlayerControl.Instance.line;
+        float angleL = weapon.entity.entityData.leftR;                           // 准备画线的弧度
+        float angleR = weapon.entity.entityData.leftR;
+        float angleL2 = 2 * Mathf.PI / (count - 1) * angleL/360;   //当前点转角，三个点形成的两段线之间的夹角
+        float angleR2 = 2 * Mathf.PI / (count - 1) * angleR / 360;
 
-        
-        for (int i = 1; i <= (count + 1); i++)
+        //Debug.Log(R);
+        weapon.Drawline.SetActive(true);
+        GameObject obj = weapon.Drawline.transform.GetChild(1).gameObject;
+        LineRenderer line = obj.GetComponent<LineRenderer>();
+        if (line == null) line = obj.AddComponent<LineRenderer>();
+
+        float x, y, z;
+        for (int i = 0; i <= (count + 1); i++)
         {
-            if (i == (count + 1))
-            {
-                //float x = Mathf.Cos(angle2) * R + v.x;
-                //float y = Mathf.Sin(angle2 * i) * R +v.y;
-                //float z = 0;
-                //vPath.Add(new Vector3(x, y, z));
-            }
-            else
-            {
-                float x = Mathf.Cos(angle2 * (i+ count/4)) * R + v.x;
-                float y = Mathf.Sin(angle2 * (i+ count / 4)) * R + v.y; 
-                float z = 0;
-                vPath.Add(new Vector3(x, y, z));
-            }
+
+            //Debug.Log($"RRRRRR: {R}");
+            x = Mathf.Sin(angleR2 * (60 - i)) * R + v.x;
+            y = Mathf.Cos(angleR2 * (60 - i)) * R + v.y;
+            z = 0;
+            //if (i == 0)
+                //Debug.Log($"{v.x} {v.y} {x} {y} {z}");
+            vPath.Add(new Vector3(x, y, z));
+        }
+        for (int i = 0; i <= (count + 1); i++)
+        {
+                x =   v.x-Mathf.Sin(angleL2 * (i))* R ;
+                y =  v.y +Mathf.Cos(angleL2 * (i)) * R;
+                z = 0;
+            vPath.Add(new Vector3(x, y, z));
+            
 
         }
 
@@ -334,7 +411,6 @@ public class Order : Singleton<Order>
         line.endWidth = W;
         line.SetPositions(vPath.ToArray());
         
-        DrawLine(weapon);
     }
     #endregion 
 }
